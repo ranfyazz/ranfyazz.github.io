@@ -1,1 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAN — Classified Dossier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#0a0505;
+    --paper:#160c0c;
+    --paper-line:#341415;
+    --blood:#7a0d16;
+    --ember:#e0263a;
+    --ink:#e9dede;
+    --ink-dim:#9c8080;
+    --ink-faint:#5e4646;
+    --stamp:#c81c2e;
+    --mono:'IBM Plex Mono', monospace;
+    --display:'Oswald', sans-serif;
+    --sans:'Inter', sans-serif;
+  }
 
+  *{margin:0; padding:0; box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--void);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.65;
+    position:relative;
+  }
+
+  /* faint paper grain / scanline atmosphere */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background:repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.012) 0px,
+      rgba(255,255,255,0.012) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    pointer-events:none;
+    z-index:1000;
+  }
+
+  ::selection{background:var(--blood); color:#fff;}
+  a{color:inherit; text-decoration:none;}
+
+  .wrap{max-width:920px; margin:0 auto; padding:0 28px;}
+
+  /* ===== NAV ===== */
+  nav{
+    position:sticky; top:0; z-index:50;
+    background:rgba(10,5,5,0.92);
+    border-bottom:1px solid var(--paper-line);
+  }
+  nav .wrap{display:flex; align-items:center; justify-content:space-between; height:60px;}
+  .file-id{
+    font-family:var(--mono); font-size:0.82rem; color:var(--ink-faint);
+    letter-spacing:0.05em;
+  }
+  .file-id b{color:var(--ember);}
+  .tabs{display:flex; gap:0; list-style:none;}
+  .tabs a{
+    font-family:var(--mono); font-size:0.78rem; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--ink-dim);
+    padding:20px 18px; display:inline-block;
+    border-left:1px solid var(--paper-line);
+    transition:color .2s, background .2s;
+  }
+  .tabs a:hover{color:var(--ember); background:rgba(224,38,58,0.06);}
+
+  /* ===== HERO / DOSSIER COVER ===== */
+  .cover{
+    position:relative;
+    margin:56px auto 0;
+    max-width:640px;
+    padding:0 28px;
+  }
+  .cover-sheet{
+    background:var(--paper);
+    border:1px solid var(--paper-line);
+    position:relative;
+    padding:52px 44px 44px;
+    box-shadow:0 30px 70px -30px rgba(224,38,58,0.22);
+  }
+  .cover-sheet::before{
+    /* corner staple marks */
+    content:"";
+    position:absolute; top:14px; left:14px;
+    width:8px; height:8px; border-radius:50%;
+    background:#2a1414; box-shadow: inset 0 1px 2px rgba(0,0,0,0.6);
+  }
+  .cover-sheet::after{
+    content:"";
+    position:absolute; top:14px; right:14px;
+    width:8px; height:8px; border-radius:50%;
+    background:#2a1414; box-shadow: inset 0 1px 2px rgba(0,0,0,0.6);
+  }
+
+  .clearance-row{
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:var(--mono); font-size:0.72rem; letter-spacing:0.1em;
+    color:var(--ink-faint); text-transform:uppercase;
+    border-bottom:1px dashed var(--paper-line);
+    padding-bottom:16px; margin-bottom:28px;
+  }
+  .clearance-row .status{
+    color:var(--ember);
+    display:flex; align-items:center; gap:6px;
+  }
+  .clearance-row .status .dot{
+    width:6px; height:6px; border-radius:50%; background:var(--ember);
+    box-shadow:0 0 6px var(--ember);
+    animation:blip 1.6s ease-in-out infinite;
+  }
+  @keyframes blip{0%,100%{opacity:1;} 50%{opacity:0.3;}}
+
+  .redact-line{
+    display:flex; align-items:baseline; gap:10px;
+    font-family:var(--mono); font-size:0.72rem; color:var(--ink-faint);
+    margin-bottom:10px; text-transform:uppercase; letter-spacing:0.05em;
+  }
+  .redact-bar{
+    display:inline-block; height:0.9em; background:#050202;
+    border-radius:1px;
+  }
+
+  .subject-name{
+    font-family:var(--display); font-weight:700; text-transform:uppercase;
+    font-size:3.4rem; letter-spacing:0.01em; color:var(--ink);
+    margin:6px 0 6px;
+    position:relative;
+    line-height:1;
+  }
+  .subject-name .accent{color:var(--ember);}
+
+  .designation{
+    font-family:var(--mono); font-size:0.95rem; color:var(--ink-dim);
+    margin-bottom:30px;
+  }
+
+  .stamp{
+    position:absolute; top:38px; right:-18px;
+    font-family:var(--display); font-weight:700; text-transform:uppercase;
+    font-size:0.95rem; letter-spacing:0.15em;
+    color:var(--stamp);
+    border:3px solid var(--stamp);
+    padding:6px 14px;
+    transform:rotate(9deg);
+    opacity:0.85;
+    border-radius:2px;
+  }
+
+  .cta-row{
+    display:flex; gap:14px; margin-top:6px; flex-wrap:wrap;
+  }
+  .btn{
+    font-family:var(--mono); font-size:0.8rem; letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:13px 22px;
+    cursor:pointer; border-radius:2px;
+    transition:all .2s;
+  }
+  .btn-primary{
+    background:var(--blood); color:#fff; border:1px solid var(--blood);
+  }
+  .btn-primary:hover{background:var(--ember); border-color:var(--ember);}
+  .btn-secondary{
+    background:transparent; color:var(--ink-dim); border:1px solid var(--paper-line);
+  }
+  .btn-secondary:hover{color:var(--ember); border-color:var(--blood);}
+
+  /* ===== SECTIONS ===== */
+  section{padding:90px 0;}
+  .tag{
+    font-family:var(--mono); font-size:0.75rem; letter-spacing:0.15em;
+    text-transform:uppercase; color:var(--ember);
+    margin-bottom:14px;
+  }
+  .tag::before{content:"§ ";}
+  h2{
+    font-family:var(--display); font-weight:600; text-transform:uppercase;
+    font-size:2.1rem; letter-spacing:0.01em; margin-bottom:22px;
+  }
+  .lead{color:var(--ink-dim); max-width:600px; font-size:1rem;}
+
+  /* ===== ABOUT — briefing sheet ===== */
+  .briefing{
+    border-top:1px solid var(--paper-line);
+    border-bottom:1px solid var(--paper-line);
+    padding:36px 0;
+    margin-top:8px;
+  }
+  .briefing p{color:var(--ink-dim); max-width:620px;}
+  .briefing p + p{margin-top:14px;}
+
+  /* ===== SKILLS — clearance levels ===== */
+  .clearance-list{margin-top:38px; display:flex; flex-direction:column;}
+  .clearance-item{
+    display:grid; grid-template-columns:140px 1fr 60px;
+    align-items:center; gap:20px;
+    padding:16px 0;
+    border-bottom:1px solid var(--paper-line);
+  }
+  .clearance-item:first-child{border-top:1px solid var(--paper-line);}
+  .clearance-name{
+    font-family:var(--mono); font-size:0.9rem; color:var(--ink);
+  }
+  .level-track{
+    height:14px; background:var(--void);
+    border:1px solid var(--paper-line);
+    display:flex; gap:2px; padding:2px;
+  }
+  .level-seg{
+    flex:1; background:#1e0d0d; transition:background .5s;
+  }
+  .level-seg.on{background:linear-gradient(180deg, var(--ember), var(--blood));}
+  .clearance-pct{
+    font-family:var(--mono); font-size:0.82rem; color:var(--ember); text-align:right;
+  }
+
+  /* ===== PROJECTS — case files ===== */
+  .case-grid{
+    margin-top:36px;
+    display:grid; grid-template-columns:repeat(2,1fr); gap:1px;
+    background:var(--paper-line);
+    border:1px solid var(--paper-line);
+  }
+  .case-card{
+    background:var(--paper);
+    padding:28px;
+    transition:background .2s;
+  }
+  .case-card:hover{background:#1d1010;}
+  .case-num{
+    font-family:var(--mono); font-size:0.72rem; color:var(--ink-faint);
+    letter-spacing:0.1em; text-transform:uppercase; margin-bottom:10px;
+    display:block;
+  }
+  .case-num b{color:var(--ember);}
+  .case-card h3{
+    font-family:var(--display); font-weight:600; text-transform:uppercase;
+    font-size:1.15rem; margin-bottom:8px; letter-spacing:0.01em;
+  }
+  .case-card p{color:var(--ink-dim); font-size:0.9rem;}
+
+  /* ===== CONTACT — transmit ===== */
+  .transmit{
+    margin-top:36px;
+    border:1px solid var(--paper-line);
+    background:var(--paper);
+    padding:38px;
+  }
+  .transmit-top{
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:var(--mono); font-size:0.75rem; color:var(--ink-faint);
+    text-transform:uppercase; letter-spacing:0.08em;
+    border-bottom:1px dashed var(--paper-line);
+    padding-bottom:16px; margin-bottom:22px;
+  }
+  .channels{display:flex; gap:12px; flex-wrap:wrap;}
+  .channels a{
+    font-family:var(--mono); font-size:0.85rem; color:var(--ink);
+    border:1px solid var(--paper-line);
+    padding:11px 20px; border-radius:2px;
+    transition:border-color .2s, color .2s;
+  }
+  .channels a:hover{border-color:var(--ember); color:var(--ember);}
+
+  footer{
+    text-align:center; padding:30px 0 50px;
+    font-family:var(--mono); font-size:0.75rem; color:var(--ink-faint);
+    letter-spacing:0.05em;
+  }
+
+  @media (max-width:640px){
+    .tabs{display:none;}
+    .subject-name{font-size:2.3rem;}
+    .stamp{position:static; display:inline-block; margin-top:16px; transform:rotate(-3deg);}
+    .cover-sheet{padding:36px 24px 32px;}
+    .case-grid{grid-template-columns:1fr;}
+    .clearance-item{grid-template-columns:100px 1fr 46px; gap:12px;}
+    .transmit-top{flex-direction:column; align-items:flex-start; gap:6px;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="file-id">FILE // <b>RAN</b>-2026</div>
+    <ul class="tabs">
+      <li><a href="#brief">Brief</a></li>
+      <li><a href="#clearance">Clearance</a></li>
+      <li><a href="#cases">Cases</a></li>
+      <li><a href="#transmit">Transmit</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="cover">
+  <div class="cover-sheet">
+    <div class="stamp">Active</div>
+    <div class="clearance-row">
+      <span>Dossier No. RN-0142</span>
+      <span class="status"><span class="dot"></span> Open to opportunities</span>
+    </div>
+
+    <div class="redact-line">
+      Subject <span class="redact-bar" style="width:60px;"></span>
+    </div>
+
+    <h1 class="subject-name">Ran<span class="accent">.</span></h1>
+    <div class="designation">Web Developer / Cybersecurity Enthusiast</div>
+
+    <div class="cta-row">
+      <a href="#cases" class="btn btn-primary">Open Case Files</a>
+      <a href="#transmit" class="btn btn-secondary">Transmit Message</a>
+    </div>
+  </div>
+</div>
+
+<section id="brief">
+  <div class="wrap">
+    <div class="tag">Subject Brief</div>
+    <h2>Background</h2>
+    <div class="briefing">
+      <p>Second-year college student building toward a career at the intersection of web development and cybersecurity. Comfortable moving between writing code and breaking it apart to see how it fails.</p>
+      <p>Driven by curiosity more than credentials — most of what's below was learned by building something, then figuring out what went wrong.</p>
+    </div>
+  </div>
+</section>
+
+<section id="clearance">
+  <div class="wrap">
+    <div class="tag">Skill Clearance Levels</div>
+    <h2>Capabilities</h2>
+    <p class="lead">Self-assessed proficiency across the stack, rated by clearance level.</p>
+
+    <div class="clearance-list">
+      <div class="clearance-item">
+        <span class="clearance-name">PYTHON</span>
+        <div class="level-track" data-pct="95"></div>
+        <span class="clearance-pct">95%</span>
+      </div>
+      <div class="clearance-item">
+        <span class="clearance-name">BASH</span>
+        <div class="level-track" data-pct="80"></div>
+        <span class="clearance-pct">80%</span>
+      </div>
+      <div class="clearance-item">
+        <span class="clearance-name">HTML</span>
+        <div class="level-track" data-pct="75"></div>
+        <span class="clearance-pct">75%</span>
+      </div>
+      <div class="clearance-item">
+        <span class="clearance-name">CSS</span>
+        <div class="level-track" data-pct="60"></div>
+        <span class="clearance-pct">60%</span>
+      </div>
+      <div class="clearance-item">
+        <span class="clearance-name">JAVASCRIPT</span>
+        <div class="level-track" data-pct="40"></div>
+        <span class="clearance-pct">40%</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cases">
+  <div class="wrap">
+    <div class="tag">Field Work</div>
+    <h2>Case Files</h2>
+    <p class="lead">A few projects pulled from the archive.</p>
+
+    <div class="case-grid">
+      <div class="case-card">
+        <span class="case-num">Case <b>N.01</b> — Python</span>
+        <h3>Project One</h3>
+        <p>Short description of what this project does and the problem it solves.</p>
+      </div>
+      <div class="case-card">
+        <span class="case-num">Case <b>N.02</b> — Bash</span>
+        <h3>Project Two</h3>
+        <p>Short description of what this project does and the problem it solves.</p>
+      </div>
+      <div class="case-card">
+        <span class="case-num">Case <b>N.03</b> — Web</span>
+        <h3>Project Three</h3>
+        <p>Short description of what this project does and the problem it solves.</p>
+      </div>
+      <div class="case-card">
+        <span class="case-num">Case <b>N.04</b> — Security</span>
+        <h3>Project Four</h3>
+        <p>Short description of what this project does and the problem it solves.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="transmit">
+  <div class="wrap">
+    <div class="tag">Secure Channel</div>
+    <h2>Transmit a Message</h2>
+
+    <div class="transmit">
+      <div class="transmit-top">
+        <span>Encryption: none — but I do read everything</span>
+        <span>Response time: ~24h</span>
+      </div>
+      <div class="channels">
+        <a href="mailto:you@example.com">Email</a>
+        <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  END OF FILE — RAN-2026 — © 2026
+</footer>
+
+<script>
+  // build clearance level segments (10 blocks) and animate fill on scroll
+  document.querySelectorAll('.level-track').forEach(track => {
+    const pct = parseInt(track.dataset.pct, 10);
+    const segments = 10;
+    for (let i = 0; i < segments; i++) {
+      const seg = document.createElement('div');
+      seg.className = 'level-seg';
+      track.appendChild(seg);
+    }
+    track._filled = Math.round((pct / 100) * segments);
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const track = entry.target;
+        const segs = track.querySelectorAll('.level-seg');
+        segs.forEach((seg, i) => {
+          setTimeout(() => {
+            if (i < track._filled) seg.classList.add('on');
+          }, i * 60);
+        });
+        observer.unobserve(track);
+      }
+    });
+  }, { threshold: 0.4 });
+
+  document.querySelectorAll('.level-track').forEach(t => observer.observe(t));
+</script>
+
+</body>
+</html>
