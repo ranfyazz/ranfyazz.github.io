@@ -53,37 +53,31 @@ function renderCaseFiles(files) {
   files.forEach(file => {
     if (!file || !file.number || !file.title || !file.tool || !file.description) return;
 
-    const card = document.createElement("article");
+    const card = document.createElement(file.url ? "a" : "article");
     card.className = "case-card";
+    if (file.url) {
+      card.classList.add("case-card-link");
+      card.href = file.url;
+      card.target = "_blank";
+      card.rel = "noopener";
+    }
 
     const number = document.createElement("span");
     number.className = "case-num";
     number.textContent = `Case ${file.number} — ${file.tool}`;
 
     const title = document.createElement("h3");
-    if (file.url) {
-      const link = document.createElement("a");
-      link.href = file.url;
-      link.target = "_blank";
-      link.rel = "noopener";
-      link.textContent = file.title;
-      title.appendChild(link);
-    } else {
-      title.textContent = file.title;
-    }
+    title.textContent = file.title;
 
     const description = document.createElement("p");
     description.textContent = file.description;
 
     card.append(number, title, description);
     if (file.url) {
-      const repositoryLink = document.createElement("a");
-      repositoryLink.className = "case-link";
-      repositoryLink.href = file.url;
-      repositoryLink.target = "_blank";
-      repositoryLink.rel = "noopener";
-      repositoryLink.textContent = "Open repository ->";
-      card.appendChild(repositoryLink);
+      const repositoryLabel = document.createElement("span");
+      repositoryLabel.className = "case-link";
+      repositoryLabel.textContent = "Open repository ->";
+      card.appendChild(repositoryLabel);
     }
     results.appendChild(card);
   });
