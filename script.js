@@ -1,9 +1,10 @@
 const caseFiles = [
   {
     number: "N.01",
-    title: "Python Automation",
-    tool: "Python",
-    description: "A practical automation project built to turn repetitive work into a reliable command-line workflow."
+    title: "Spotify Lyrics Flow",
+    tool: "Web",
+    description: "A Spotify-inspired web project focused on presenting lyrics in a smooth, readable flow.",
+    url: "https://github.com/ranfyazz/Spotify-Lyrics-Flow-like-project"
   },
   {
     number: "N.02",
@@ -60,7 +61,16 @@ function renderCaseFiles(files) {
     number.textContent = `Case ${file.number} — ${file.tool}`;
 
     const title = document.createElement("h3");
-    title.textContent = file.title;
+    if (file.url) {
+      const link = document.createElement("a");
+      link.href = file.url;
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.textContent = file.title;
+      title.appendChild(link);
+    } else {
+      title.textContent = file.title;
+    }
 
     const description = document.createElement("p");
     description.textContent = file.description;
