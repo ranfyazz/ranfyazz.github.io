@@ -76,6 +76,15 @@ function renderCaseFiles(files) {
     description.textContent = file.description;
 
     card.append(number, title, description);
+    if (file.url) {
+      const repositoryLink = document.createElement("a");
+      repositoryLink.className = "case-link";
+      repositoryLink.href = file.url;
+      repositoryLink.target = "_blank";
+      repositoryLink.rel = "noopener";
+      repositoryLink.textContent = "Open repository ->";
+      card.appendChild(repositoryLink);
+    }
     results.appendChild(card);
   });
 }
