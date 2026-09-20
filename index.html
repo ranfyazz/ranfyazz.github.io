@@ -6,6 +6,7 @@
 <title>RAN — Classified Dossier</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="script.js" defer></script>
 <style>
   :root{
     --void:#0a0505;
@@ -250,6 +251,32 @@
   }
   .case-card p{color:var(--ink-dim); font-size:0.9rem;}
 
+  /* ===== ARCHIVE SEARCH — data-driven case files ===== */
+  .archive-console{
+    margin-top:36px;
+    border:1px solid var(--paper-line);
+    background:var(--paper);
+    padding:28px;
+  }
+  .archive-console label{
+    display:block;
+    font-family:var(--mono); font-size:0.78rem; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--ink-faint); margin-bottom:10px;
+  }
+  .archive-console input{
+    width:100%; padding:13px 15px;
+    background:var(--void); color:var(--ink);
+    border:1px solid var(--paper-line); border-radius:2px;
+    font:0.9rem var(--mono);
+  }
+  .archive-console input:focus{outline:1px solid var(--ember); border-color:var(--ember);}
+  .archive-status{
+    min-height:24px; margin:18px 0 0;
+    font:0.78rem var(--mono); color:var(--ink-faint);
+  }
+  .archive-results{margin-top:18px; display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:var(--paper-line);}
+  .archive-results .case-card{min-height:150px;}
+
   /* ===== CONTACT — transmit ===== */
   .transmit{
     margin-top:36px;
@@ -285,6 +312,7 @@
     .stamp{position:static; display:inline-block; margin-top:16px; transform:rotate(-3deg);}
     .cover-sheet{padding:36px 24px 32px;}
     .case-grid{grid-template-columns:1fr;}
+    .archive-results{grid-template-columns:1fr;}
     .clearance-item{grid-template-columns:100px 1fr 46px; gap:12px;}
     .transmit-top{flex-direction:column; align-items:flex-start; gap:6px;}
   }
@@ -404,6 +432,21 @@
   </div>
 </section>
 
+<section id="archive">
+  <div class="wrap">
+    <div class="tag">Interactive Archive</div>
+    <h2>Query the Files</h2>
+    <p class="lead">Search the case archive by project, tool, or mission.</p>
+
+    <div class="archive-console">
+      <label for="case-search">Search archive</label>
+      <input id="case-search" type="search" placeholder="Try: Python, security, or web" autocomplete="off">
+      <p id="archive-status" class="archive-status" aria-live="polite">Enter a term to filter the archive.</p>
+      <div id="archive-results" class="archive-results"></div>
+    </div>
+  </div>
+</section>
+
 <section id="transmit">
   <div class="wrap">
     <div class="tag">Secure Channel</div>
@@ -426,37 +469,6 @@
 <footer>
   END OF FILE — RAN-2026 — © 2026
 </footer>
-
-<script>
-  // build clearance level segments (10 blocks) and animate fill on scroll
-  document.querySelectorAll('.level-track').forEach(track => {
-    const pct = parseInt(track.dataset.pct, 10);
-    const segments = 10;
-    for (let i = 0; i < segments; i++) {
-      const seg = document.createElement('div');
-      seg.className = 'level-seg';
-      track.appendChild(seg);
-    }
-    track._filled = Math.round((pct / 100) * segments);
-  });
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const track = entry.target;
-        const segs = track.querySelectorAll('.level-seg');
-        segs.forEach((seg, i) => {
-          setTimeout(() => {
-            if (i < track._filled) seg.classList.add('on');
-          }, i * 60);
-        });
-        observer.unobserve(track);
-      }
-    });
-  }, { threshold: 0.4 });
-
-  document.querySelectorAll('.level-track').forEach(t => observer.observe(t));
-</script>
 
 </body>
 </html>
